@@ -52,3 +52,4 @@ def init_db() -> None:
             ]
         ):
             conn.execute(text(ddl))
+            conn.commit()
