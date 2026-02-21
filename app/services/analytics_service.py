@@ -39,12 +39,11 @@ def get_monthly_active_merchants(db: Session) -> dict[str, int]:
 
 
 def get_product_adoption(db: Session) -> dict[str, int]:
-    """Unique merchant count per product (successful events), sorted by count descending."""
+    """Unique merchant count per product, sorted by count descending."""
     rows = db.execute(
         text("""
             SELECT product, COUNT(DISTINCT merchant_id) AS cnt
             FROM activities
-            WHERE status = 'SUCCESS'
             GROUP BY product
             ORDER BY cnt DESC
         """)
