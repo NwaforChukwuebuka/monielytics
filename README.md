@@ -20,7 +20,15 @@ REST API to analyze merchant activity logs. Data are loaded into a PostgreSQL ba
    cd monielytics
    ```
 
-2. **Environment**
+2. **Create and activate a virtual environment**
+   ```bash
+   python -m venv venv
+   ```
+   Activate it:
+   - **Windows:** `venv\Scripts\activate`
+   - **Linux/macOS:** `source venv/bin/activate`
+
+3. **Environment**
    ```bash
    cp .env.example .env
    ```
@@ -29,18 +37,18 @@ REST API to analyze merchant activity logs. Data are loaded into a PostgreSQL ba
    DATABASE_URL=postgresql://user:password@localhost:5432/<datebase_name>
    ```
 
-3. **Install dependencies**
+4. **Install dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Run the API**
+5. **Run the API**
    ```bash
    uvicorn main:app --host 0.0.0.0 --port 8080
    ```
    Docs: [http://localhost:8080/api/docs](http://localhost:8080/api/docs)
 
-5. **Load activity data from CSV**
+6. **Load activity data from CSV**
    ```bash
    python scripts/import_data.py
    ```
