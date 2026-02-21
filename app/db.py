@@ -1,4 +1,5 @@
 """Database engine, session factory, and dependency."""
+import logging
 from contextlib import contextmanager
 from typing import Generator
 
@@ -7,6 +8,8 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from app.config import DATABASE_URL
 from app.models import Base
+
+logger = logging.getLogger(__name__)
 
 engine = create_engine(
     DATABASE_URL,
@@ -41,15 +44,15 @@ def db_session() -> Generator[Session, None, None]:
 
 def init_db() -> None:
     """Create tables and indexes if they do not exist."""
-    Base.metadata.create_all(bind=engine)
+    logger.info("Creating tables if not exist")
     # Composite indexes for analytics queries
+    Base.metadata.create_all(bind=engine)
     with engine.connect() as conn:
-        for idx, ddl in enumerate(
-            [
-                "CREATE INDEX IF NOT EXISTS ix_activities_status_product ON activities (status, product)",
-                "CREATE INDEX IF NOT EXISTS ix_activities_status_ts ON activities (status, event_timestamp)",
-                "CREATE INDEX IF NOT EXISTS ix_activities_product_status ON activities (product, status)",
-            ]
-        ):
+        for ddl in [
+            "CREATE INDEX IF NOT EXISTS ix_activities_status_product ON activities (status, product)",
+            "CREATE INDEX IF NOT EXISTS ix_activities_status_ts ON activities (status, event_timestamp)",
+            "CREATE INDEX IF NOT EXISTS ix_activities_product_status ON activities (product, status)",
+        ]:
             conn.execute(text(ddl))
             conn.commit()
+    logger.info("Database schema initialized")
