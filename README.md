@@ -34,16 +34,16 @@ REST API to analyze merchant activity logs. Data are loaded into a PostgreSQL ba
    pip install -r requirements.txt
    ```
 
-4. **Optional — load activity data from CSV**
-   ```bash
-   python scripts/import_data.py
-   ```
-
-5. **Run the API**
+4. **Run the API**
    ```bash
    uvicorn main:app --host 0.0.0.0 --port 8080
    ```
    Docs: [http://localhost:8080/api/docs](http://localhost:8080/api/docs)
+
+5. **Optional — load activity data from CSV**
+   ```bash
+   python scripts/import_data.py
+   ```
 
 ---
 

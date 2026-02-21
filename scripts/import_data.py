@@ -14,9 +14,10 @@ from uuid import UUID
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from sqlalchemy import delete
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.config import DATA_DIR, DATA_FILE_PATTERN
-from app.db import db_session
+from app.db import db_session, init_db
 from app.models import Activity
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
@@ -132,6 +133,13 @@ def import_file(path: Path, db, batch: list) -> tuple[int, int]:
 
 
 def main():
+    # Ensure tables/indexes exist before attempting idempotent truncate/reload.
+    try:
+        init_db()
+    except SQLAlchemyError as exc:
+        logger.error("Failed to initialize database schema: %s", exc)
+        sys.exit(1)
+
     if not DATA_DIR.is_dir():
         logger.error("Data directory not found: %s", DATA_DIR)
         sys.exit(1)
@@ -142,18 +150,22 @@ def main():
     logger.info("Found %d CSV files", len(files))
     total_inserted = 0
     total_skipped = 0
-    with db_session() as db:
-        # Clear existing data so re-runs are idempotent
-        db.execute(delete(Activity))
-        batch: list[Activity] = []
-        for path in files:
-            inserted, skipped = import_file(path, db, batch)
-            total_inserted += inserted
-            total_skipped += skipped
-            logger.info("%s: inserted=%d skipped=%d", path.name, inserted, skipped)
-        if batch:
-            db.bulk_save_objects(batch)
-            db.flush()
+    try:
+        with db_session() as db:
+            # Clear existing data so re-runs are idempotent
+            db.execute(delete(Activity))
+            batch: list[Activity] = []
+            for path in files:
+                inserted, skipped = import_file(path, db, batch)
+                total_inserted += inserted
+                total_skipped += skipped
+                logger.info("%s: inserted=%d skipped=%d", path.name, inserted, skipped)
+            if batch:
+                db.bulk_save_objects(batch)
+                db.flush()
+    except SQLAlchemyError as exc:
+        logger.error("Import failed while writing to database: %s", exc)
+        sys.exit(1)
     logger.info("Done. Total inserted=%d total skipped=%d", total_inserted, total_skipped)
 
 
