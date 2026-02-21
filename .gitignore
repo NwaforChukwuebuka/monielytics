@@ -13,8 +13,5 @@ build
 # Local plan only — do not push to GitHub
 check.md
 
-# Activity CSVs stay local
-data/*.csv
-
 # Runtime logs (directory kept via logs/.gitkeep)
 logs/*.log
