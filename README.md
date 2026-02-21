@@ -40,7 +40,7 @@ REST API to analyze merchant activity logs. Data are loaded into a PostgreSQL ba
    ```
    Docs: [http://localhost:8080/api/docs](http://localhost:8080/api/docs)
 
-5. **Optional — load activity data from CSV**
+5. **Load activity data from CSV**
    ```bash
    python scripts/import_data.py
    ```
