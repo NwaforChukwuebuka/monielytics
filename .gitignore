@@ -1,0 +1,17 @@
+.env
+.venv
+venv
+__pycache__
+*.pyc
+.pytest_cache
+.coverage
+htmlcov
+*.egg-info
+dist
+build
+
+# Local plan only — do not push to GitHub
+check.md
+
+# Activity CSVs stay local
+data/*.csv
